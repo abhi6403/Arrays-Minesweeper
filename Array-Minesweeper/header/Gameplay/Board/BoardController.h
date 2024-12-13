@@ -1,15 +1,22 @@
 #pragma once
-#include "../../header/Gameplay/Board/BoardView.h"
+#include"SFML/Graphics.hpp"
+#include"../../header/Gameplay/Cell/CellController.h"
+
 namespace Gameplay
 {
 	namespace Board
 	{
+		class BoardView;
+
 		class BoardController
 		{
 		private:
 			BoardView* board_view;
+			Cell::CellController* cell;
 		
 			void createBoard();
+			void initializeCells();
+			void resetBoard();
 			void deleteBoard();
 			void destroy();
 			
