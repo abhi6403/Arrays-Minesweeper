@@ -6,6 +6,7 @@ namespace Gameplay
 		class BoardController
 		{
 		private:
+			BoardView* board_view;
 		
 			void createBoard();
 			void deleteBoard();
