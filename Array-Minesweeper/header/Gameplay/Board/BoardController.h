@@ -1,4 +1,5 @@
 #pragma once
+#include "../../header/Gameplay/Board/BoardView.h"
 namespace Gameplay
 {
 	namespace Board
