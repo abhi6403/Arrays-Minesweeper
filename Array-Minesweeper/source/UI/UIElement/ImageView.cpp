@@ -76,5 +76,10 @@ namespace UI
 
             image_sprite.setPosition(x_position, y_position);
         }
+
+        void ImageView::setTextureRect(sf::IntRect texture_rect)
+        {
+            image_sprite.setTextureRect(texture_rect);
+        }
     }
 }

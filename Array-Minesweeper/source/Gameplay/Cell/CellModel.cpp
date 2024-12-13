@@ -6,27 +6,40 @@ namespace Gameplay
 	{
 		CellModel::CellModel()
 		{
-
+			reset();
 		}
 
-		CellModel::~CellModel()
-		{
+		CellModel::~CellModel() = default;
 
+		CellState CellModel::getCellState()
+		{
+			return cell_state;
 		}
 
-		void CellModel::initialize()
+		void CellModel::setCellState(CellState state)
 		{
-
+			cell_state = state;
 		}
 
-		void CellModel::update()
+		CellValue CellModel::getCellValue()
 		{
-
+			return cell_value;
 		}
 
-		void CellModel::render()
+		void CellModel::setCellValue(CellValue value)
 		{
+			cell_value = value;
+		}
 
+		void CellModel::reset()
+		{
+			cell_state = CellState::HIDDEN;
+			cell_value = CellValue::EMPTY;
+		}
+
+		sf::Vector2i CellModel::getCellPosition()
+		{
+			return sf::Vector2i(0,0);
 		}
 
 	}

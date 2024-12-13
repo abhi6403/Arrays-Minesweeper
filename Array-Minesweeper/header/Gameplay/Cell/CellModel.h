@@ -1,20 +1,50 @@
 #pragma once
+#include<SFML/Graphics.hpp>
 
 namespace Gameplay
 {
 	namespace Cell
 	{
-		class CellModel
-		{
-		private:
+        enum class CellState
+        {
+            HIDDEN,
+            OPEN,
+            FLAGGED,
+        };
 
-		public:
-			CellModel();
-			~CellModel();
+        enum class CellValue
+        {
+            EMPTY,
+            ONE,
+            TWO,
+            THREE,
+            FOUR,
+            FIVE,
+            SIX,
+            SEVEN,
+            EIGHT,
+            MINE,
+        };
 
-			void initialize();
-			void update();
-			void render();
-		};
+        class CellModel
+        {
+        private:
+            CellState cell_state;
+            CellValue cell_value;
+
+        public:
+            CellModel();
+            ~CellModel();
+
+            CellState getCellState();
+            void setCellState(CellState state);
+
+            CellValue getCellValue();
+            void setCellValue(CellValue value);
+
+            sf::Vector2i getCellPosition();
+
+            void reset();
+        };
 	}
 }

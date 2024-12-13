@@ -1,16 +1,20 @@
 #pragma once
-#include "sfml/Graphics.hpp"
+#include <sfml/Graphics.hpp>
 
 namespace Gameplay
 {
 	namespace Cell
 	{
 		class CellView;
+		class CellModel;
+		enum class CellState;
+		enum class CellValue;
 
 		class CellController
 		{
 		private:
 			CellView* cell_view;
+			CellModel* cell_model;
 
 			void destroy();
 
@@ -22,6 +26,14 @@ namespace Gameplay
 			void update();
 			void render();
 			void reset();
+
+			CellState getCellState();
+			void setCellState(CellState state);
+
+			CellValue getCellValue();
+			void setCellValue(CellValue value);
+
+			sf::Vector2i getCellPosition();
 		};
 	}
 }

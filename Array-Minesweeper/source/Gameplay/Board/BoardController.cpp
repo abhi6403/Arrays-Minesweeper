@@ -56,5 +56,10 @@ namespace Gameplay
 			deleteBoard();
 			delete(board_view);
 		}
+
+		void BoardController::initializeCells()
+		{
+
+		}
 	}
 }

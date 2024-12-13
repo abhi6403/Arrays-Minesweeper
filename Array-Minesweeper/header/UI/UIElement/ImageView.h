@@ -22,6 +22,7 @@ namespace UI
 			virtual void setTexture(sf::String texture_path);
 			virtual void setScale(float width, float height);
 			virtual void setPosition(sf::Vector2f position);
+			virtual void setTextureRect(sf::IntRect texture_rect);
 			virtual void setRotation(float rotation_angle);
 			virtual void setOriginAtCentre();
 			virtual void setImageAlpha(float alpha);
