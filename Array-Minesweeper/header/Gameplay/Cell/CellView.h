@@ -30,6 +30,8 @@ namespace Gameplay
 			void update();
 			void render();
 			void reset();
+			void registerButtonCallback();
+			void cellButtonCallback(UI::UIElement::ButtonType button_type);
 
 			void setCellTexture();
 			sf::Vector2f getCellScreenPosition(float width, float height);
