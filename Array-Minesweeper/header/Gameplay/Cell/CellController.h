@@ -19,7 +19,7 @@ namespace Gameplay
 			void destroy();
 
 		public:
-			CellController();
+			CellController(int cell_index);
 			~CellController();
 
 			void initialize(float cell_width, float cell_height);
@@ -28,12 +28,12 @@ namespace Gameplay
 			void reset();
 
 			CellState getCellState();
-			void setCellState(CellState state);
 
 			CellValue getCellValue();
-			void setCellValue(CellValue value);
 
 			sf::Vector2i getCellPosition();
+
+			int getCellIndex();
 		};
 	}
 }

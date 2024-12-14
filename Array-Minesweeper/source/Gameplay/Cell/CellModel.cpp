@@ -4,9 +4,9 @@ namespace Gameplay
 {
 	namespace Cell
 	{
-		CellModel::CellModel()
+		CellModel::CellModel(int cell_index)
 		{
-			reset();
+			this->cell_index = cell_index;
 		}
 
 		CellModel::~CellModel() = default;
@@ -42,5 +42,9 @@ namespace Gameplay
 			return sf::Vector2i(0,0);
 		}
 
+		int CellModel::getCellIndex()
+		{
+			return cell_index;
+		}
 	}
 }

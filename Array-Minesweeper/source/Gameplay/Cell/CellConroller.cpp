@@ -11,9 +11,9 @@ namespace Gameplay
 		using namespace Global;
 		using namespace Sound;
 
-		CellController::CellController()
+		CellController::CellController(int cell_index)
 		{
-			cell_model = new CellModel();
+			cell_model = new CellModel(cell_index);
 			cell_view = new CellView(this);
 		}
 
@@ -27,20 +27,10 @@ namespace Gameplay
 			return cell_model->getCellState();
 		}
 
-		/*void CellController::setCellState(CellState state)
-		{
-			cell_model->setCellState(state);
-		}*/
-
 		CellValue CellController::getCellValue()
 		{
 			return cell_model->getCellValue();
 		}
-
-		/*void CellController::setCellValue(CellValue value)
-		{
-			cell_model->setCellValue(value);
-		}*/
 
 		sf::Vector2i CellController::getCellPosition()
 		{
@@ -70,6 +60,11 @@ namespace Gameplay
 		void CellController::reset()
 		{
 			cell_model->reset();
+		}
+
+		int CellController::getCellIndex()
+		{
+			return cell_model->getCellIndex();
 		}
 	}
 }
