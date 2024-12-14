@@ -34,6 +34,7 @@ namespace Gameplay
 			void update();
 			void render();
 			void reset();
+			int getMinesCount();
 
 		};
 	}

@@ -1,4 +1,5 @@
 #pragma once
+
 namespace Gameplay
 {
 	class GameplayController
@@ -18,5 +19,7 @@ namespace Gameplay
 
 		void updateRemainingTime();
 		float getRemainingTime();
+
+		int getMinesCount();
 	};
 }
