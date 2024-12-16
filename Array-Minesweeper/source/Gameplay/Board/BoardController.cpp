@@ -168,6 +168,21 @@ namespace Gameplay
 			}
 		}
 
+		void BoardController::openAllCells()
+		{
+			if (board_state == BoardState::FIRST_CELL)
+			{
+				populateBoard(sf::Vector2i(0, 0));
+			}
+
+			for (int a = 0; a < number_of_rows_; ++a)
+			{
+				for (int b = 0; b < number_of_colums; ++b)
+				{
+					board[a][b]->openCell();
+				}
+			}
+		}
 		void BoardController::populateBoard(sf::Vector2i cell_position)
 		{
 			populateMines(cell_position);

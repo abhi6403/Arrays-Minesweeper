@@ -32,6 +32,7 @@ namespace Gameplay
 			void deleteBoard();
 			void destroy();
 			void populateCells();
+			void openAllCells();
 			void populateBoard(sf::Vector2i cell_position);
 			void populateMines(sf::Vector2i cell_position);
 			void flagCell(sf::Vector2i cell_position);
