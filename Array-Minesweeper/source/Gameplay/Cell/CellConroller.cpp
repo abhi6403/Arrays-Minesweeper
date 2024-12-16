@@ -85,5 +85,15 @@ namespace Gameplay
 				break;
 			}
 		}
+
+		void CellController::setCellValue(CellValue value)
+		{
+			cell_model->setCellValue(value);
+		}
+
+		void CellController::setCellState(CellState state)
+		{
+			cell_model->setCellState(state);
+		}
 	}
 }

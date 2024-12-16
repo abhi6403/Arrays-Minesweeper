@@ -14,7 +14,7 @@ namespace Gameplay
 		using namespace Global;
 		using namespace Sound;
 
-		BoardController::BoardController()
+		BoardController::BoardController() : random_engine(random_device())
 		{
 			board_view = new BoardView(this);
 			createBoard();
@@ -36,6 +36,17 @@ namespace Gameplay
 			}
 		}
 
+		void BoardController::populateCells()
+		{
+			for (int a = 0; a < number_of_rows_; a++)
+			{
+				for (int b = 0; b < number_of_colums; b++)
+				{
+					CellValue value = static_cast<CellValue>(countMinesAround(sf::Vector2i(2, b)));
+					board[a][b]->setCellValue(value);
+				}
+			}
+		}
 		void BoardController::initialize()
 		{
 			board_view->initialize();
@@ -121,12 +132,62 @@ namespace Gameplay
 			return mines_count - flagged_cell;
 		}
 
+		int BoardController::countMinesAround(sf::Vector2i cell_position)
+		{
+			int mines_around = 0;
+
+			for (int a = -1; a < 2; a++)
+			{
+				for (int b = -1; b < 2; b++)
+				{
+					if ((a == 0 && b == 0) || !isValidCellPosition(sf::Vector2i(cell_position.x + a, cell_position.y + b)))continue;
+
+					if (board[a + cell_position.x][b + cell_position.y]->getCellValue() == CellValue::MINE)mines_around++;
+				}
+			}
+			
+			return mines_around;
+		}
+
+		bool BoardController::isValidCellPosition(sf::Vector2i cell_position)
+		{
+			return (cell_position.x >= 0 && cell_position.y >= 0 && cell_position.x < number_of_colums && cell_position.y < number_of_rows_);
+		}
+
 		void BoardController::openCell(sf::Vector2i cell_position)
 		{
 			if (board[cell_position.x][cell_position.y]->canOpenCell())
 			{
+				if (board_state == BoardState::FIRST_CELL)
+				{
+					populateBoard(cell_position);
+					board_state = BoardState::PLAYING;
+				}
+
 				board[cell_position.x][cell_position.y]->openCell();
 			}
+		}
+
+		void BoardController::populateBoard(sf::Vector2i cell_position)
+		{
+			populateMines(cell_position);
+			populateCells();
+		}
+
+		void BoardController::populateMines(sf::Vector2i cell_position)
+		{
+			std::uniform_int_distribution<int>x_distribution(0, number_of_colums - 1);
+			std::uniform_int_distribution<int>y_distribution(0, number_of_rows_ - 1);
+
+			for (int a = 0; a < mines_count; a++)
+			{
+				int i = static_cast<int>(x_distribution(random_engine));
+				int j = static_cast<int>(y_distribution(random_engine));
+
+				if (board[i][j]->getCellValue() == CellValue::MINE || (cell_position.x == i && cell_position.y == j))a--;
+				else board[i][j]->setCellValue(CellValue::MINE);
+			}
+			
 		}
 
 		void BoardController::processCellInput(CellController* cell_controller, ButtonType button_type)
@@ -159,6 +220,16 @@ namespace Gameplay
 			}
 
 			board[cell_position.x][cell_position.y]->flagCell();
+		}
+
+		BoardState BoardController::getBoardState()
+		{
+			return board_state;
+		}
+
+		void BoardController::setBoardState(BoardState state)
+		{
+			board_state = state;
 		}
 	}
 }
