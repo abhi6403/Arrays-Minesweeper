@@ -163,7 +163,7 @@ namespace Gameplay
 					populateBoard(cell_position);
 					board_state = BoardState::PLAYING;
 				}
-
+				processCellValue(cell_position);
 				board[cell_position.x][cell_position.y]->openCell();
 			}
 		}
@@ -181,6 +181,20 @@ namespace Gameplay
 				{
 					board[a][b]->openCell();
 				}
+			}
+		}
+
+		void BoardController::processCellValue(sf::Vector2i cell_position)
+		{
+			switch (board[cell_position.x][cell_position.y]->getCellValue())
+			{
+			case::Gameplay::Cell::CellValue::EMPTY:
+				break;
+			case::Gameplay::Cell::CellValue::MINE:
+				break;
+			default:
+				ServiceLocator::getInstance()->getSoundService()->playSound(SoundType::BUTTON_CLICK);
+				break;
 			}
 		}
 		void BoardController::populateBoard(sf::Vector2i cell_position)
