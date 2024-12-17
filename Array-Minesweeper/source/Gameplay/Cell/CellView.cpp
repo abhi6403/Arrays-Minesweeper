@@ -1,4 +1,5 @@
 #include "../../header/Gameplay/Cell/CellView.h"
+#include<iostream>
 #include"../../header/Global/Config.h"
 #include "../../header/Gameplay/Cell/CellController.h"
 #include"../../header/Gameplay/Cell/CellModel.h"
@@ -30,8 +31,20 @@ namespace Gameplay
 
 		void CellView::initializeButtonImage(float width, float height)
 		{
-			cell_button->initialize("Cell", Config::cells_texture_path, width * slice_count, height, getCellScreenPosition(width, height));
+			sf::Vector2f cell_screen_position = getCellScreenPosition(width, height);
+
+			cell_button->initialize("Cell", Config::cells_texture_path, width * slice_count, height, cell_screen_position);
 			registerButtonCallback();
+		}
+
+		sf::Vector2f CellView::getCellScreenPosition(float width, float height)
+		{
+			sf::Vector2i cell_index = cell_controller->getCellPosition();
+
+			float x_screen_position = cell_left_offset + cell_index.y * width;
+			float y_screen_position = cell_top_offset + cell_index.x * height;
+
+			return sf::Vector2f(x_screen_position, y_screen_position);
 		}
 
 		void CellView::update()
@@ -69,16 +82,6 @@ namespace Gameplay
 				break;
 	
 			}
-		}
-
-		sf::Vector2f CellView::getCellScreenPosition(float width, float height)
-		{
-			sf::Vector2i cell_index = cell_controller->getCellPosition();
-
-			float x_screen_position = cell_left_offset + cell_index.y * width;
-			float y_screen_position = cell_top_offset + cell_index.x * height;
-
-			return sf::Vector2f(x_screen_position, y_screen_position);
 		}
 
 		void CellView::registerButtonCallback()

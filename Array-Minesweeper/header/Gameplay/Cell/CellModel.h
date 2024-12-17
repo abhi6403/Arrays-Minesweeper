@@ -33,6 +33,7 @@ namespace Gameplay
             CellValue cell_value;
 
             sf::Vector2i position;
+            int mines_around;
 
         public:
             CellModel(sf::Vector2i position);
@@ -46,6 +47,9 @@ namespace Gameplay
 
             sf::Vector2i getCellPosition();
             void setCellPosition(sf::Vector2i position);
+
+            int getMinesAround();
+            void setMinesAround(int mine_count);
 
             void reset();
         };

@@ -1,15 +1,21 @@
 #include"../../header/Gameplay/GameplayController.h"
 #include"../../header/Global/ServiceLocator.h"
 #include"../../header/Main/GameService.h"
+#include"../../header/Gameplay/Board/BoardService.h"
+#include"../../header/Time/TimeService.h"
 
 namespace Gameplay
 {
 	using namespace Global;
 	using namespace Main;
+	using namespace Board;
+	using namespace Cell;
+	using namespace UI::UIElement;
+	using namespace Time;
 
 	GameplayController::GameplayController()
 	{
-
+		
 	}
 
 	GameplayController::~GameplayController()
@@ -41,30 +47,29 @@ namespace Gameplay
 
 	}
 
-	void GameplayController::reset()
-	{
-		remaining_time = max_duration;
-		ServiceLocator::getInstance()->getBoardService()->resetBoard();
-	}
-
 	void GameplayController::updateRemainingTime()
 	{
+		if (game_result == GameResult::WON)
+			return;
+
 		remaining_time -= ServiceLocator::getInstance()->getTimeService()->getDeltaTime();
 	}
 
-	float GameplayController::getRemainingTime()
+	void GameplayController::reset()
 	{
-		return remaining_time;
-	}
-
-	void GameplayController::beginGameOverTimer()
-	{
-		remaining_time = game_over_time;
+		game_result = GameResult::NONE;
+		remaining_time = max_duration;
+		ServiceLocator::getInstance()->getBoardService()->resetBoard();
 	}
 
 	int GameplayController::getMinesCount()
 	{
 		return ServiceLocator::getInstance()->getBoardService()->getMinesCount();
+	}
+
+	float GameplayController::getRemainingTime()
+	{
+		return remaining_time;
 	}
 
 	void GameplayController::endGame(GameResult result)
@@ -80,6 +85,11 @@ namespace Gameplay
 		default:
 			break;
 		}
+	}
+
+	void GameplayController::beginGameOverTimer()
+	{
+		remaining_time = game_over_time;
 	}
 
 	void GameplayController::gameLost()
@@ -99,7 +109,10 @@ namespace Gameplay
 
 	void GameplayController::gameWon()
 	{
-
+		game_result = GameResult::WON;
+		ServiceLocator::getInstance()->getBoardService()->flagAllMines();
+		ServiceLocator::getInstance()->getBoardService()->setBoardState(Board::BoardState::COMPLETED);
+		ServiceLocator::getInstance()->getSoundService()->playSound(Sound::SoundType::GAME_WON);
 	}
 
 	void GameplayController::showCredits()

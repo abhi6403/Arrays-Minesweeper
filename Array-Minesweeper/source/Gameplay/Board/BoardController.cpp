@@ -36,21 +36,25 @@ namespace Gameplay
 			}
 		}
 
-		void BoardController::populateCells()
-		{
-			for (int a = 0; a < number_of_rows_; a++)
-			{
-				for (int b = 0; b < number_of_colums; b++)
-				{
-					CellValue value = static_cast<CellValue>(countMinesAround(sf::Vector2i(2, b)));
-					board[a][b]->setCellValue(value);
-				}
-			}
-		}
 		void BoardController::initialize()
 		{
 			board_view->initialize();
 			initializeCells();
+			reset();
+		}
+
+		void BoardController::initializeCells()
+		{
+			float cell_width = board_view->getCellWidth();
+			float cell_height = board_view->getCellHeight();
+
+			for (int a = 0; a < number_of_rows_; a++)
+			{
+				for (int b = 0; b < number_of_colums; b++)
+				{
+					board[a][b]->initialize(cell_width, cell_height);
+				}
+			}
 		}
 
 		void BoardController::update()
@@ -78,76 +82,58 @@ namespace Gameplay
 				}
 			}
 		}
-		
-		void BoardController::reset()
-		{
-			flagged_cell = 0;
-			resetBoard();
-		}
 
-		void BoardController::resetBoard()
+		void BoardController::processCellInput(CellController* cell_controller, ButtonType button_type)
 		{
-			for (int row = 0; row < number_of_rows_; ++row)
-			{
-				for (int col = 0; col < number_of_colums; ++col)
-				{
-					board[row][col]->reset();
-				}
-			}
-		}
+			if (board_state == BoardState::COMPLETED)
+				return;
 
-		void BoardController::showBoard()
-		{
-			switch (ServiceLocator::getInstance()->getBoardService()->getBoardState())
+			switch (button_type)
 			{
-			case Gameplay::Board::BoardState::FIRST_CELL:
-				populateBoard(sf::Vector2i(0, 0));
-				openAllCells();
+			case UI::UIElement::LEFT_MOUSE_BUTTON:
+				openCell(cell_controller->getCellPosition());
 				break;
-			case Gameplay::Board::BoardState::PLAYING:
-				openAllCells();
-				break;
-			case Gameplay::Board::BoardState::COMPLETED:
-				break;
-			default:
+			case UI::UIElement::RIGHT_MOUSE_BUTTON:
+				flagCell(cell_controller->getCellPosition());
 				break;
 			}
 		}
 
-		void BoardController::deleteBoard()
+		void BoardController::populateBoard(sf::Vector2i cell_position)
+		{
+			populateMines(cell_position);
+			populateCells();
+		}
+
+		void BoardController::populateCells()
 		{
 			for (int a = 0; a < number_of_rows_; a++)
 			{
 				for (int b = 0; b < number_of_colums; b++)
 				{
-					delete board[a][b];
+					if (board[a][b]->getCellValue() != CellValue::MINE)
+					{
+						CellValue value = static_cast<CellValue>(countMinesAround(sf::Vector2i(a, b)));
+						board[a][b]->setCellValue(value);
+					}
 				}
 			}
 		}
 
-		void BoardController::destroy()
+		void BoardController::populateMines(sf::Vector2i cell_position)
 		{
-			deleteBoard();
-			delete(board_view);
-		}
+			std::uniform_int_distribution<int>x_distribution(0, number_of_colums - 1);
+			std::uniform_int_distribution<int>y_distribution(0, number_of_rows_ - 1);
 
-		void BoardController::initializeCells()
-		{
-			float cell_width = board_view->getCellWidth();
-			float cell_height = board_view->getCellHeight();
-
-			for (int a = 0; a < number_of_rows_; a++)
+			for (int a = 0; a < mines_count; a++)
 			{
-				for (int b = 0; b < number_of_colums; b++)
-				{
-					board[a][b]->initialize(cell_width, cell_height);
-				}
-			}
-		}
+				int i = static_cast<int>(x_distribution(random_engine));
+				int j = static_cast<int>(y_distribution(random_engine));
 
-		int BoardController::getMinesCount()
-		{
-			return mines_count - flagged_cell;
+				if (board[i][j]->getCellValue() == CellValue::MINE || (cell_position.x == i && cell_position.y == j))a--;
+				else board[i][j]->setCellValue(CellValue::MINE);
+			}
+
 		}
 
 		int BoardController::countMinesAround(sf::Vector2i cell_position)
@@ -163,13 +149,25 @@ namespace Gameplay
 					if (board[a + cell_position.x][b + cell_position.y]->getCellValue() == CellValue::MINE)mines_around++;
 				}
 			}
-			
+
 			return mines_around;
 		}
 
-		bool BoardController::isValidCellPosition(sf::Vector2i cell_position)
+		void BoardController::flagCell(sf::Vector2i cell_position)
 		{
-			return (cell_position.x >= 0 && cell_position.y >= 0 && cell_position.x < number_of_colums && cell_position.y < number_of_rows_);
+			switch (board[cell_position.x][cell_position.y]->getCellState())
+			{
+			case::Gameplay::Cell::CellState::FLAGGED:
+				ServiceLocator::getInstance()->getSoundService()->playSound(SoundType::FLAG);
+				flagged_cell--;
+				break;
+			case::Gameplay::Cell::CellState::HIDDEN:
+				ServiceLocator::getInstance()->getSoundService()->playSound(SoundType::FLAG);
+				flagged_cell++;
+				break;
+			}
+
+			board[cell_position.x][cell_position.y]->flagCell();
 		}
 
 		void BoardController::openCell(sf::Vector2i cell_position)
@@ -183,43 +181,20 @@ namespace Gameplay
 				}
 				processCellValue(cell_position);
 				board[cell_position.x][cell_position.y]->openCell();
+
+				if (areAllCellOpen())
+					ServiceLocator::getInstance()->getGameplayService()->endGame(GameResult::WON);
 			}
 		}
 
-		void BoardController::openAllCells()
+		void BoardController::flagAllMines()
 		{
-			for (int a = 0; a < number_of_rows_; ++a)
+			for (int row = 0; row < number_of_rows_; ++row)
 			{
-				for (int b = 0; b < number_of_colums; ++b)
+				for (int col = 0; col < number_of_colums; ++col)
 				{
-					board[a][b]->openCell();
-				}
-			}
-		}
-
-		void BoardController::openEmptyCells(sf::Vector2i cell_position)
-		{
-			switch (board[cell_position.x][cell_position.y]->getCellState())
-			{
-			case::Gameplay::Cell::CellState::OPEN:
-				return;
-	
-			case::Gameplay::Cell::CellState::FLAGGED:
-				flagged_cell--;
-			default:
-				board[cell_position.x][cell_position.y]->openCell();
-			}
-
-			for (int a = -1; a < 2; a++)
-			{
-				for (int b = -1; b < 2; b++)
-				{
-					if((a == 0 && b == 0 || !isValidCellPosition(sf::Vector2i(a+cell_position.x, b+cell_position.y))))
-						continue;
-
-					sf::Vector2i next_cell_position = sf::Vector2i(a + cell_position.x, b + cell_position.y);
-
-					openCell(next_cell_position);
+					if (board[row][col]->getCellValue() == CellValue::MINE && board[row][col]->getCellState() != CellState::FLAGGED)
+						flagCell(sf::Vector2i(row, col));
 				}
 			}
 		}
@@ -251,58 +226,127 @@ namespace Gameplay
 			ServiceLocator::getInstance()->getSoundService()->playSound(SoundType::BUTTON_CLICK);
 			openEmptyCells(cell_position);
 		}
-		void BoardController::populateBoard(sf::Vector2i cell_position)
-		{
-			populateMines(cell_position);
-			populateCells();
-		}
 
-		void BoardController::populateMines(sf::Vector2i cell_position)
+		void BoardController::openEmptyCells(sf::Vector2i cell_position)
 		{
-			std::uniform_int_distribution<int>x_distribution(0, number_of_colums - 1);
-			std::uniform_int_distribution<int>y_distribution(0, number_of_rows_ - 1);
-
-			for (int a = 0; a < mines_count; a++)
+			switch (board[cell_position.x][cell_position.y]->getCellState())
 			{
-				int i = static_cast<int>(x_distribution(random_engine));
-				int j = static_cast<int>(y_distribution(random_engine));
+			case::Gameplay::Cell::CellState::OPEN:
+				return;
 
-				if (board[i][j]->getCellValue() == CellValue::MINE || (cell_position.x == i && cell_position.y == j))a--;
-				else board[i][j]->setCellValue(CellValue::MINE);
+			case::Gameplay::Cell::CellState::FLAGGED:
+				flagged_cell--;
+			default:
+				board[cell_position.x][cell_position.y]->openCell();
 			}
-			
+
+			for (int a = -1; a < 2; a++)
+			{
+				for (int b = -1; b < 2; b++)
+				{
+					if ((a == 0 && b == 0 || !isValidCellPosition(sf::Vector2i(a + cell_position.x, b + cell_position.y))))
+						continue;
+
+					sf::Vector2i next_cell_position = sf::Vector2i(a + cell_position.x, b + cell_position.y);
+
+					openCell(next_cell_position);
+				}
+			}
 		}
 
-		void BoardController::processCellInput(CellController* cell_controller, ButtonType button_type)
+		void BoardController::openAllCells()
 		{
-			switch (button_type)
+			for (int a = 0; a < number_of_rows_; ++a)
 			{
-			case UI::UIElement::LEFT_MOUSE_BUTTON:
-				openCell(cell_controller->getCellPosition());
+				for (int b = 0; b < number_of_colums; ++b)
+				{
+					board[a][b]->openCell();
+				}
+			}
+		}
+
+		bool BoardController::isValidCellPosition(sf::Vector2i cell_position)
+		{
+			return (cell_position.x >= 0 && cell_position.y >= 0 && cell_position.x < number_of_colums && cell_position.y < number_of_rows_);
+		}
+
+		bool BoardController::areAllCellOpen()
+		{
+			int total_cell_count = number_of_rows_ * number_of_colums;
+			int open_cell_count = 0;
+
+			for (int a = 0; a < number_of_rows_; a++)
+			{
+				for (int b = 0; b < number_of_colums; b++)
+				{
+					if (board[a][b]->getCellState() == CellState::OPEN)
+					{
+						open_cell_count++;
+					}
+				}
+			}
+
+			return (total_cell_count - open_cell_count == mines_count);
+		}
+
+		void BoardController::showBoard()
+		{
+			switch (ServiceLocator::getInstance()->getBoardService()->getBoardState())
+			{
+			case Gameplay::Board::BoardState::FIRST_CELL:
+				populateBoard(sf::Vector2i(0, 0));
+				openAllCells();
 				break;
-			case UI::UIElement::RIGHT_MOUSE_BUTTON:
-				flagCell(cell_controller->getCellPosition());
+			case Gameplay::Board::BoardState::PLAYING:
+				openAllCells();
+				break;
+			case Gameplay::Board::BoardState::COMPLETED:
 				break;
 			default:
 				break;
 			}
 		}
 
-		void BoardController::flagCell(sf::Vector2i cell_position)
+		void BoardController::reset()
 		{
-			switch (board[cell_position.x][cell_position.y]->getCellState())
-			{
-			case::Gameplay::Cell::CellState::FLAGGED:
-				ServiceLocator::getInstance()->getSoundService()->playSound(SoundType::FLAG);
-				flagged_cell--; 
-				break;
-			case::Gameplay::Cell::CellState::HIDDEN:
-				ServiceLocator::getInstance()->getSoundService()->playSound(SoundType::FLAG);
-				flagged_cell++; 
-				break;
-			}
+			resetBoard();
+			flagged_cell = 0;
+			board_state = BoardState::FIRST_CELL;
+		}
 
-			board[cell_position.x][cell_position.y]->flagCell();
+		void BoardController::resetBoard()
+		{
+			for (int row = 0; row < number_of_rows_; ++row)
+			{
+				for (int col = 0; col < number_of_colums; ++col)
+				{
+					board[row][col]->reset();
+				}
+			}
+		}
+
+		void BoardController::deleteBoard()
+		{
+			for (int a = 0; a < number_of_rows_; a++)
+			{
+				for (int b = 0; b < number_of_colums; b++)
+				{
+					delete board[a][b];
+				}
+			}
+		}
+
+		void BoardController::destroy()
+		{
+			deleteBoard();
+			delete(board_view);
+		}
+
+		
+
+		int BoardController::getMinesCount()
+		{
+			return mines_count - flagged_cell;
 		}
 
 		BoardState BoardController::getBoardState()

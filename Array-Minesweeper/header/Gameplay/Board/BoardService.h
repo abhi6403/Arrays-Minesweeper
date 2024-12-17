@@ -2,6 +2,7 @@
 #include "../../header/Gameplay/Board/BoardController.h"
 #include"../../header/Gameplay/Cell/CellController.h"
 #include"../../header/UI/UIElement/ButtonView.h"`
+
 namespace Gameplay
 {
 	using namespace Cell;
@@ -26,6 +27,7 @@ namespace Gameplay
 
 			void resetBoard();
 			void showBoard();
+			void flagAllMines();
 			void processCellInput(CellController* cell_controller, ButtonType button_type);
 
 			int getMinesCount();

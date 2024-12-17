@@ -5,11 +5,17 @@ namespace Gameplay
 	GameplayService::GameplayService()
 	{
 		gameplay_controller = new GameplayController();
+		createController();
 	}
 
 	GameplayService::~GameplayService()
 	{
+		destroy();
+	}
 
+	void GameplayService::createController()
+	{
+		gameplay_controller = new GameplayController();
 	}
 
 	void GameplayService::initialize()
@@ -45,5 +51,10 @@ namespace Gameplay
 	void GameplayService::endGame(GameResult result)
 	{
 		gameplay_controller->endGame(result);
+	}
+
+	void GameplayService::destroy()
+	{
+		delete(gameplay_controller);
 	}
 }

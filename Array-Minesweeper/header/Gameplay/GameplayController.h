@@ -1,4 +1,5 @@
 #pragma once
+#include<SFML/Graphics.hpp>
 
 namespace Gameplay
 {
@@ -8,6 +9,7 @@ namespace Gameplay
 		WON,
 		LOST,
 	};
+	
 	class GameplayController
 	{
 	private:
@@ -17,7 +19,15 @@ namespace Gameplay
 
 		bool isTimeOut();
 
-		GameResult game_result = GameResult::NONE;
+		GameResult game_result;
+
+		void updateRemainingTime();
+		void showCredits();
+		void beginGameOverTimer();
+
+		void gameLost();
+		void gameWon();
+
 	public:
 		GameplayController();
 		~GameplayController();
@@ -28,14 +38,9 @@ namespace Gameplay
 
 		void reset();
 		void endGame(GameResult result);
-		void gameLost();
-		void gameWon();
-		void showCredits();
-
-		void updateRemainingTime();
+		
 		float getRemainingTime();
-		void beginGameOverTimer();
-
+		
 		int getMinesCount();
 	};
 }

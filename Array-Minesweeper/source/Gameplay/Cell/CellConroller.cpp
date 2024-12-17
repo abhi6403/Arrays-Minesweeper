@@ -22,21 +22,6 @@ namespace Gameplay
 			destroy();
 		}
 
-		CellState CellController::getCellState()
-		{
-			return cell_model->getCellState();
-		}
-
-		CellValue CellController::getCellValue()
-		{
-			return cell_model->getCellValue();
-		}
-
-		sf::Vector2i CellController::getCellPosition()
-		{
-			return cell_model->getCellPosition();
-		}
-
 		void CellController::initialize(float cell_width, float cell_height)
 		{
 			cell_view->initialize(cell_width, cell_height);
@@ -52,29 +37,14 @@ namespace Gameplay
 			cell_view->update();
 		}
 
-		void CellController::destroy()
-		{
-			delete(cell_view);
-			delete(cell_model);
-		}
-
-		void CellController::reset()
-		{
-			cell_model->reset();
-		}
-
-		void CellController::openCell()
-		{
-			cell_model->setCellState(CellState::OPEN);
-		}
-
-		bool CellController::canOpenCell()
-		{
-			return cell_model->getCellState() != CellState::FLAGGED && cell_model->getCellState() != CellState::OPEN;
-		}
-
 		void CellController::flagCell()
 		{
+			if (ServiceLocator::getInstance()->getBoardService()->getBoardState() == Gameplay::Board::BoardState::COMPLETED)
+			{
+				cell_model->setCellState(CellState::FLAGGED);
+				return;
+			}
+
 			switch (cell_model->getCellState())
 			{
 			case::Gameplay::Cell::CellState::FLAGGED:
@@ -86,14 +56,56 @@ namespace Gameplay
 			}
 		}
 
-		void CellController::setCellValue(CellValue value)
+		void CellController::openCell()
 		{
-			cell_model->setCellValue(value);
+			setCellState(CellState::OPEN);
+		}
+
+		bool CellController::canOpenCell()
+		{
+			return cell_model->getCellState() != CellState::FLAGGED && cell_model->getCellState() != CellState::OPEN;
+		}
+
+		CellState CellController::getCellState()
+		{
+			return cell_model->getCellState();
 		}
 
 		void CellController::setCellState(CellState state)
 		{
 			cell_model->setCellState(state);
 		}
+
+		CellValue CellController::getCellValue()
+		{
+			return cell_model->getCellValue();
+		}
+
+		void CellController::setCellValue(CellValue value)
+		{
+			cell_model->setCellValue(value);
+		}
+
+		sf::Vector2i CellController::getCellPosition()
+		{
+			return cell_model->getCellPosition();
+		}
+
+		int CellController::getMinesAround()
+		{
+			return cell_model->getMinesAround();
+		}
+
+		void CellController::destroy()
+		{
+			delete(cell_view);
+			delete(cell_model);
+		}
+
+		void CellController::reset()
+		{
+			cell_model->reset();
+		}
+
 	}
 }

@@ -26,6 +26,7 @@ namespace Gameplay
 			void update();
 			void render();
 			void reset();
+
 			void openCell();
 			void flagCell();
 
@@ -33,10 +34,12 @@ namespace Gameplay
 
 			CellState getCellState();
 			void setCellState(CellState state);
+
 			void setCellValue(CellValue value);
 			CellValue getCellValue();
 
 			sf::Vector2i getCellPosition();
+			int getMinesAround();
 		};
 	}
 }

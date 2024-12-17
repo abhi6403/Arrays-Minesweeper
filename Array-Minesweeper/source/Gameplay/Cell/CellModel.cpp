@@ -6,6 +6,7 @@ namespace Gameplay
 	{
 		CellModel::CellModel(sf::Vector2i position)
 		{
+			reset();
 			this->position = position;
 		}
 
@@ -35,6 +36,7 @@ namespace Gameplay
 		{
 			cell_state = CellState::HIDDEN;
 			cell_value = CellValue::EMPTY;
+			mines_around = 0;
 		}
 
 		sf::Vector2i CellModel::getCellPosition()
@@ -45,6 +47,16 @@ namespace Gameplay
 		void CellModel::setCellPosition(sf::Vector2i position)
 		{
 			this->position = position;
+		}
+
+		int CellModel::getMinesAround()
+		{
+			return mines_around;
+		}
+
+		void CellModel::setMinesAround(int mine_count)
+		{
+			mines_around = mine_count;
 		}
 	}
 }

@@ -8,6 +8,9 @@ namespace Gameplay
 	private:
 		GameplayController* gameplay_controller;
 
+		void createController();
+		void destroy();
+
 	public:
 		GameplayService();
 		~GameplayService();
