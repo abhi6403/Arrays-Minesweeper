@@ -15,6 +15,8 @@ namespace Gameplay
 		float remaining_time;
 		const float game_over_time = 11.f;
 
+		bool isTimeOut();
+
 		GameResult game_result = GameResult::NONE;
 	public:
 		GameplayController();
