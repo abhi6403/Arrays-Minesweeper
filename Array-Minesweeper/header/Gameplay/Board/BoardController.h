@@ -35,6 +35,7 @@ namespace Gameplay
 			void openAllCells();
 			void openEmptyCells(sf::Vector2i cell_position);
 			void processEmptyCell(sf::Vector2i cell_position);
+			void processMineCell(sf::Vector2i cell_position);
 			void processCellValue(sf::Vector2i cell_position);
 			void populateBoard(sf::Vector2i cell_position);
 			void populateMines(sf::Vector2i cell_position);
@@ -47,9 +48,9 @@ namespace Gameplay
 			bool isValidCellPosition(sf::Vector2i cell_position);
 
 		public:
-			static const int number_of_rows_ = 9;
-			static const int number_of_colums = 9;
-			static const int mines_count = 8;
+			static const int number_of_rows_ = 15;
+			static const int number_of_colums = 15;
+			static const int mines_count = 10;
 			int flagged_cell;
 
 			std::default_random_engine random_engine;
@@ -63,6 +64,7 @@ namespace Gameplay
 			void initialize();
 			void update();
 			void render();
+			void showBoard();
 			void reset();
 			int getMinesCount();
 			

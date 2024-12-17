@@ -24,6 +24,9 @@ namespace Sound
 		else
 			if (!flag_click.loadFromFile(Config::flag_sound_path))
 				printf("Error loading background music file");
+			else
+				if (!explosion.loadFromFile(Config::explosion_sound_path))
+					printf("roor loading explosion music file");
 	}
 
 	void SoundService::playSound(SoundType soundType)

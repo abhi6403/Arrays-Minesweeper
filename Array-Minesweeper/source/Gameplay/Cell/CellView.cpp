@@ -67,6 +67,7 @@ namespace Gameplay
 			case::Gameplay::Cell::CellState::FLAGGED:
 				cell_button->setTextureRect(sf::IntRect(11 * tile_size, 0, tile_size, tile_size));
 				break;
+	
 			}
 		}
 
